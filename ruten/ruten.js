@@ -21,6 +21,11 @@ var detailUrl = 'https://rtapi.ruten.com.tw/api/prod/v1/index.php/prod?id=',
     idRows = [],
     productsDetail = [];
 
+/*
+    露天的搜尋有兩層
+    透過第一層取得到的ID 列表後、用join 的方式把id 們當成參數傳給另一個api
+    而且，沒有pi 的概念，用的是offset 來換算頁數
+*/
 if (userInput) {
     // 露天的推薦系統
     request({

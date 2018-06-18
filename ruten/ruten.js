@@ -100,7 +100,9 @@ function formatData(products) {
     for (var i = 0; i < products.length; i++) {
         obj[products[i].Id] = Object.assign(products[i]);
     }
-    writeFile('result.json', JSON.stringify(obj));
+
+    createDirectory('result');
+    writeFile('result/' + userInput.replace(/ /g, '_') + '-result.json', JSON.stringify(obj));
 }
 
 function updateUrl(pi, query) {

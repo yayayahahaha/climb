@@ -15,39 +15,43 @@ var lib = require('../lib.js'),
     request = lib.request;
 
 var detailUrl = 'https://rtapi.ruten.com.tw/api/prod/v1/index.php/prod?id=',
-    userInput = 'kill la kill',
+    userInput = process.argv[2],
     encodedUserInput = encodeURI(userInput),
     pi = 1,
     idRows = [],
     productsDetail = [];
 
-// 露天的推薦系統
-request({
-    url: 'https://rtapi.ruten.com.tw/api/rtb/v1/index.php/core/prod?offset=1&limit=11&q=' + encodedUserInput
-}).then(function(body) {
-    try {
-        var products = JSON.parse(body).Rows;
-        if (products) {
-            products = [].map.call(products, function(item, index) {
-                return item.Id;
-            });
+if (userInput) {
+    // 露天的推薦系統
+    request({
+        url: 'https://rtapi.ruten.com.tw/api/rtb/v1/index.php/core/prod?offset=1&limit=11&q=' + encodedUserInput
+    }).then(function(body) {
+        try {
+            var products = JSON.parse(body).Rows;
+            if (products) {
+                products = [].map.call(products, function(item, index) {
+                    return item.Id;
+                });
 
-            request({
-                url: detailUrl + products.join(',')
-            }).then(function(body) {
-                try {
-                    productsDetail = productsDetail.concat(JSON.parse(body));
+                request({
+                    url: detailUrl + products.join(',')
+                }).then(function(body) {
+                    try {
+                        productsDetail = productsDetail.concat(JSON.parse(body));
 
-                    getAllProduct(pi, userInput);
-                } catch (e) {
-                    console.log(e);
-                }
-            });
+                        getAllProduct(pi, userInput);
+                    } catch (e) {
+                        console.log(e);
+                    }
+                });
+            }
+        } catch (e) {
+            console.log(e);
         }
-    } catch (e) {
-        console.log(e);
-    }
-});
+    });
+} else {
+    console.log('請輸入想要查詢的項目');
+}
 
 function getAllProduct(pi, userInput) {
     pi = pi ? pi : 1;
@@ -90,7 +94,7 @@ function getAllProduct(pi, userInput) {
 
 function formatData(products) {
     var obj = {};
-    products = products.sort(function(a, b){
+    products = products.sort(function(a, b) {
         return a.Price.Direct - b.Price.Direct;
     });
     for (var i = 0; i < products.length; i++) {
